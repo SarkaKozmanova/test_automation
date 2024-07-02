@@ -1,23 +1,36 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.github.bonigarcia.wdm.webdriver.WebDriverBrowser;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class HomePageTest {
+    WebDriver browser = WebDriverManager.firefoxdriver().create();
 
 
-    @Test
-    void homePageTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
+    void waitFor(int seconds) {
+        try {
+            Thread.sleep(seconds * 1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @BeforeEach
+    void beforeTest() {
         browser.get("https://mall.cz");
 
         //accept cookies
         WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
         cookiesAcceptButton.click();
+    }
 
+
+    @Test
+    void homePageTest() {
         Assertions.assertEquals("MALL.CZ – bílé zboží, elektronika, PC, outdoor, hobby, hračky, kosmetika, chovatelské potřeby", browser.getTitle());
 
         //click a button based on its index (0,1 or 2)
@@ -27,40 +40,39 @@ public class HomePageTest {
 
     @Test
     void hairDryerTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
-        browser.get("https://mall.cz");
 
-        //accept cookies
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
+        ProductSelection productSelectionPage = new ProductSelection(browser);
+        Product productPage = new Product(browser);
+        Cart cartPage = new Cart(browser);
+        Home homePage = new Home(browser);
+        CrossCart crossCartPage = new CrossCart(browser);
 
-        browser.findElement(By.cssSelector(".desktop-menu__item-title")).click();
-
-
-        // Click on hairdryers
+        //open menu with categories
+        homePage.openItemsOfCategory(0);
+        //click on hairdryers
         browser.findElement(By.xpath("//a[@href='/feny']")).click();
-        browser.findElement(By.cssSelector(".bs__name")).click();
+        waitFor(5);
+        //select first item from popular items
+        productSelectionPage.selectPopularItem(0);
+        waitFor(3);
 
-        var expectedName = browser.findElement(By.cssSelector(".detail__title--desktop")).getText();
+        var expectedName = productPage.getProductName();
 
-        browser.findElement(By.cssSelector(".info-box__main-btn .add-to-cart-list")).click();
-        browser.findElement(By.cssSelector(".cross-sell__button__to-cart__to")).click();
+        //add to item to cart
+        productPage.addToCart();
+        waitFor(3);
+        //go to cart
+        crossCartPage.goToCart();
+        waitFor(3);
 
-        var actualName = browser.findElement(By.cssSelector(".cart-overview-item-title")).getText();
-
+        var actualName = cartPage.getProductName(0);
+        //check if actualName of item is same as expectedName of item
         Assertions.assertEquals(expectedName, actualName);
 
     }
 
     @Test
     void navigateToRegistrationFormTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
-        browser.get("https://mall.cz");
-
-        //accept cookies
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
-
         //click on Přihlásit
         browser.findElement(By.cssSelector(".drop-down .desktop-icon")).click();
         //click on Zaregistrovat se
@@ -71,12 +83,6 @@ public class HomePageTest {
 
     @Test
     void registrationNegativeTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
-        browser.get("https://mall.cz");
-        //accept cookies
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
-
         //click on Přihlásit
         browser.findElement(By.cssSelector(".drop-down .desktop-icon")).click();
         //click on Zaregistrovat se
@@ -99,82 +105,85 @@ public class HomePageTest {
 
     @Test
     void akceDneTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
-        browser.get("https://mall.cz");
-
-        //accept cookies
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
+        Cart cartPage = new Cart(browser);
+        Product productPage = new Product(browser);
+        Home homePage = new Home(browser);
+        CategoryDetails categoryDetailsPage = new CategoryDetails(browser);
+        CrossCart crossCartPage = new CrossCart(browser);
+        ActionsOfDay actionsOfDayPage = new ActionsOfDay(browser);
+        ProductSelection productSelectionPage = new ProductSelection(browser);
 
         //click on Akce dne
-        browser.findElement(By.cssSelector(".corner-wrapper__img")).click();
+        homePage.actionOfTheDayButton();
         //click on uplnenejvic
-        browser.findElements(By.xpath("//a[@href='/uplnenejvic']//img")).get(1).click();
+        actionsOfDayPage.selectOfferOfTheDay(0);
         //click on Lednice
-        browser.findElement(By.xpath("//a[@href='/listy/cooling-chladnicky']")).click();
+        categoryDetailsPage.selectAkceDneSubcategories(0);
+        //click on unique item
+        productSelectionPage.selectItem(0);
         //click on Koupit
-        browser.findElement(By.cssSelector(".add-to-cart-wrapper")).click();
+        productPage.addToCart();
         //go to cart
-        browser.findElement(By.cssSelector(".cross-sell__button")).click();
+        crossCartPage.goToCart();
         //delete items
-        browser.findElement(By.cssSelector(".cart-overview-item-row__delete .cart__remove-icon")).click();
+        cartPage.deleteCartItem(0);
         //ověřit, že je košík prázdný
-        var actualNot_NoItems = browser.findElement(By.cssSelector(".msg--indent-medium")).getText();
-        Assertions.assertEquals("Momentálně nemáte v košíku vloženo žádné zboží.", actualNot_NoItems);
+        var noItemNotification = cartPage.getCartNotification();
+        Assertions.assertEquals("Momentálně nemáte v košíku vloženo žádné zboží.", noItemNotification);
 
 
     }
 
 
     @Test
-    void TipyNaDarkyTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
-        browser.get("https://mall.cz");
+    void searchFieldTest() {
+        Product productPage = new Product(browser);
+        ProductSelection productSelectionPage = new ProductSelection(browser);
+        Home homePage = new Home(browser);
+        Cart cartPage = new Cart(browser);
+        CrossCart crossCartPage = new CrossCart(browser);
+        CategoryDetails categoryDetailsPage = new CategoryDetails(browser);
 
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
         //click into search field
-        browser.findElement(By.cssSelector("#site-search")).click();
+        homePage.searchField();
         //click on Tipy na dárky
-        browser.findElement(By.cssSelector(".site-search-special-phrase")).click();
+        homePage.searchFieldSpecialPhrase();
         //click on Zážitky pro všechny
-        browser.findElements(By.cssSelector(".category-menu-item__wrapper")).get(6).click();
+        categoryDetailsPage.selectRozbalenoSubcategories(6);
         //click on zobrazit více
-        browser.findElement(By.cssSelector(".bs__show-more-link")).click();
+        productSelectionPage.showMorePopularItems();
         //click on 4. item
-        browser.findElements(By.cssSelector(".bs__link")).get(3).click();
+        productSelectionPage.selectPopularItem(3);
         //click on celý popis
-        browser.findElement(By.cssSelector(".product-short-description__full-desc")).click();
+        productPage.showProductDescription();
         //click on koupit
-        browser.findElement(By.cssSelector(".rounded-button__wrapper__slot")).click();
+        productPage.addToCart();
         //click on zpět
-        browser.findElement(By.cssSelector(".cross-sell .rounded-button__wrapper")).click();
+        crossCartPage.goBack();
+        //refresh the page
+        browser.navigate().refresh();
         //click on košík
-        browser.findElement(By.xpath("//a[@href='/kosik']")).click();
+        //homePage.goToCart();
 
         //block od MALLu, nemůžu dokončit test a zkontrolovat další kroky
 
         //přidat počet kusů
-                //browser.findElements(By.cssSelector(".article-counter__btn--plus")).get(1).click();
+        //browser.findElements(By.cssSelector(".article-counter__btn--plus")).get(1).click();
         //click on odstranit tuto zásilku
-                //browser.findElement(By.cssSelector(".box-alert__body .delete-link .delete-text")).click();
+        //browser.findElement(By.cssSelector(".box-alert__body .delete-link .delete-text")).click();
         //click on zpět v prohlížeči
-                //browser.navigate().back();
+        //browser.navigate().back();
         //ověřit, že v košíku není zboží, které bylo odstraněno
-                //var actualNot_NoItems = browser.findElement(By.cssSelector(".msg--indent-medium")).getText();
-                //Assertions.assertEquals("Momentálně nemáte v košíku vloženo žádné zboží.", actualNot_NoItems);
+        //var actualNot_NoItems = browser.findElement(By.cssSelector(".msg--indent-medium")).getText();
+        //Assertions.assertEquals("Momentálně nemáte v košíku vloženo žádné zboží.", actualNot_NoItems);
 
     }
 
     @Test
     void clickBackTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
-        browser.get("https://mall.cz");
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
-
+        Home homePage = new Home(browser);
         //click on Akce dne
-        browser.findElement(By.cssSelector(".corner-wrapper__img")).click();
+        homePage.actionOfTheDayButton();
         //click on zpět v prohlížeči
         browser.navigate().back();
         //ověřit, že jsem o krok zpět na úvodní stránce
@@ -182,40 +191,27 @@ public class HomePageTest {
     }
 
     @Test
-    void nextClickableTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
-        browser.get("https://mall.cz");
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
+    void headerMenuTest() {
+        Home homePage = new Home(browser);
         //click on Ceny dopravy
-        browser.findElements(By.cssSelector(".list-item__link__text")).get(0).click();
-        //go back
-        browser.navigate().back();
+        homePage.headerMenuSections(0);
         //click on Vše o nákupu
-        browser.findElements(By.cssSelector(".list-item__link__text")).get(1).click();
-        //go back
-        browser.navigate().back();
+        homePage.headerMenuSections(1);
         //click on Pro firmy
-        browser.findElements(By.cssSelector(".list-item__link__text")).get(2).click();
-        //go back
-        browser.navigate().back();
+        homePage.headerMenuSections(2);
         //click on Výdejní místa
-        browser.findElements(By.cssSelector(".list-item__link__text")).get(3).click();
-        //go back
+        homePage.headerMenuSections(3);
+        //click on back
         browser.navigate().back();
         //click on Kontakt
-        browser.findElements(By.cssSelector(".list-item__link__text")).get(4).click();
-        //go back
+        homePage.headerMenuSections(4);
+        //click on back
         browser.navigate().back();
         //click on Kategorie od A do Z
-        browser.findElements(By.cssSelector(".list-item__link__text")).get(5).click();
-        //go back
-        browser.navigate().back();
-        //click on Objevovat
-        browser.findElement(By.cssSelector(".anp__button-content")).click();
-        //click on nesouhlasím ??
-        //close window
-        browser.close();
+        homePage.headerMenuSections(5);
+        //click on main logo
+        browser.navigate().to("https://www.mall.cz/");
+
         //ověřit, že jsem na hlavní stránce mall
         Assertions.assertEquals("MALL.CZ – bílé zboží, elektronika, PC, outdoor, hobby, hračky, kosmetika, chovatelské potřeby", browser.getTitle());
 
@@ -223,36 +219,49 @@ public class HomePageTest {
 
     @Test
     void boatTest() {
-        WebDriver browser = WebDriverManager.firefoxdriver().create();
-        browser.get("https://mall.cz");
-
-        //accept cookies
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
+        Product productPage = new Product(browser);
+        Home homePage = new Home(browser);
+        ProductSelection productSelectionPage = new ProductSelection(browser);
+        Cart cartPage = new Cart(browser);
+        CategoryDetails categoryDetailsPage = new CategoryDetails(browser);
+        CrossCart crossCartPage = new CrossCart(browser);
 
         //click on Sport a outdoor
-        browser.findElements(By.cssSelector(".desktop-menu__item-title")).get(8).click();
+        homePage.openItemsOfCategory(8);
         // Click on Sporty
-        browser.findElement(By.xpath("//a[@href='/sportovni-aktivity']")).click();
+        categoryDetailsPage.selectCategory(0);
         // Click on Rybářské potřeby
-        browser.findElement(By.xpath("//a[@href='/rybarske-potreby']")).click();
+        categoryDetailsPage.selectSubcategory(40);
         // Click on Rybářské lodě
-        browser.findElement(By.xpath("//a[@href='/rybarske-lode']")).click();
+        categoryDetailsPage.selectSubcategory(5);
         // Click on Rybářské čluny
-        browser.findElements(By.cssSelector(".crossroad-tiles__title")).get(3).click();
+        categoryDetailsPage.selectSubcategory(4);
         // Click on 1. Nejprodávanější
-        browser.findElement(By.cssSelector(".bs__name")).click();
+        productSelectionPage.selectPopularItem(0);
 
-        var expectedName = browser.findElement(By.cssSelector(".detail__title--desktop")).getText();
+        var expectedName = productPage.getProductName();
 
         // Click on Koupit
-        browser.findElement(By.cssSelector(".info-box__buy-buttons__button-wrapper")).click();
+        productPage.addToCart();
         // Click on Přejít do košíku
-        browser.findElement(By.cssSelector(".cross-sell__button__to-cart__to")).click();
+        crossCartPage.goToCart();
 
-        var actualName = browser.findElement(By.cssSelector(".cart-overview-item-title")).getText();
+        var actualName = cartPage.getProductName(0);
 
         Assertions.assertEquals(expectedName, actualName);
 
     }
+
+
+    @Test
+    void cartOperations() {
+        Cart cartPage = new Cart(browser);
+
+        cartPage.open();
+        cartPage.goBack();
+        cartPage.open();
+        //cartPage.deleteCartItem(0);
+    }
+
+
 }
