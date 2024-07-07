@@ -13,7 +13,7 @@ public class Home {
         browser.findElements(By.cssSelector(".desktop-menu__item-title")).get(index).click();
     }
 
-    //use for categories spotřebiče/mobily/TV
+    //use for categories appliances/mobiles/TV
     void openItemsOfCategory(int index) {
         browser.findElements(By.cssSelector(".desktop-menu__item-title")).get(index).click();
     }
@@ -41,4 +41,14 @@ public class Home {
     void searchFieldSpecialPhrase(){
         browser.findElement(By.cssSelector(".site-search-special-phrase")).click();
     }
+
+    void logIn(){
+        browser.findElement(By.cssSelector(".desktop-icons__item--user")).click();
+    }
+
+    void singUp(){
+        browser.findElement(By.cssSelector(".user-unsigned__registration")).click();
+    }
+
+
 }

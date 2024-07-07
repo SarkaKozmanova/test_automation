@@ -9,7 +9,7 @@ public class CategoryDetails {
     }
 
 
-    //use for catogories sport/domácnost/móda
+    //use for catogories sport/household/fashion
 
     void selectCategory(int index) {
         browser.findElements(By.cssSelector(".category-tile-item__wrapper")).get(index).click();
@@ -21,15 +21,15 @@ public class CategoryDetails {
         browser.findElements(By.cssSelector(".navigation-menu__link")).get(index).click();
     }
 
-    //use for category Rozbaleno, Tipy na dárky
+    //use for category unpacked, tips for gifts
 
-    void selectRozbalenoSubcategories(int index) {
+    void selectUnpackedSubcategories(int index) {
         browser.findElements(By.cssSelector(".category-menu-item__title")).get(index).click();
     }
 
-    //use for AkceDneTest
+    //use for actionOfTheDayTest
 
-    void selectAkceDneSubcategories(int index) {
+    void selectActionOfTheDaySubcategories(int index) {
         browser.findElements(By.cssSelector(".campaign__category-box")).get(index).click();
     }
 

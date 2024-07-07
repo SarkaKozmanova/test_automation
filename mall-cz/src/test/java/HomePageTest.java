@@ -9,7 +9,14 @@ import org.openqa.selenium.WebElement;
 
 public class HomePageTest {
     WebDriver browser = WebDriverManager.firefoxdriver().create();
-
+    ProductSelection productSelectionPage;
+    Product productPage;
+    Cart cartPage;
+    Home homePage;
+    CrossCart crossCartPage;
+    ActionsOfDay actionsOfDayPage;
+    CategoryDetails categoryDetailsPage;
+    RegistrationForm registrationFormPage;
 
     void waitFor(int seconds) {
         try {
@@ -26,6 +33,16 @@ public class HomePageTest {
         //accept cookies
         WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
         cookiesAcceptButton.click();
+
+        productSelectionPage = new ProductSelection(browser);
+        productPage = new Product(browser);
+        cartPage = new Cart(browser);
+        homePage = new Home(browser);
+        crossCartPage = new CrossCart(browser);
+        categoryDetailsPage = new CategoryDetails(browser);
+        actionsOfDayPage = new ActionsOfDay(browser);
+        registrationFormPage = new RegistrationForm(browser);
+
     }
 
 
@@ -40,12 +57,6 @@ public class HomePageTest {
 
     @Test
     void hairDryerTest() {
-
-        ProductSelection productSelectionPage = new ProductSelection(browser);
-        Product productPage = new Product(browser);
-        Cart cartPage = new Cart(browser);
-        Home homePage = new Home(browser);
-        CrossCart crossCartPage = new CrossCart(browser);
 
         //open menu with categories
         homePage.openItemsOfCategory(0);
@@ -73,61 +84,54 @@ public class HomePageTest {
 
     @Test
     void navigateToRegistrationFormTest() {
-        //click on Přihlásit
-        browser.findElement(By.cssSelector(".drop-down .desktop-icon")).click();
-        //click on Zaregistrovat se
-        browser.findElement(By.cssSelector(".user-unsigned__button-link")).click();
+        
+        //click on log in
+        homePage.logIn();
+        //click on sign up
+        homePage.singUp();
         //check the registration form page
         Assertions.assertEquals("Registrace | MALL.CZ", browser.getTitle());
     }
 
     @Test
-    void registrationNegativeTest() {
-        //click on Přihlásit
-        browser.findElement(By.cssSelector(".drop-down .desktop-icon")).click();
-        //click on Zaregistrovat se
-        //browser.findElement(By.cssSelector(".user-unsigned__button-link")).click();
-        browser.findElement(By.xpath("//a[@href='/user/register/register']")).click();
+    void wrongEmailRegistrationTest() {
+
+        //click on log in
+        homePage.logIn();
+        //click on sign up
+        homePage.singUp();
         //fill registration form
         browser.findElement(By.id("registration-firstname")).sendKeys("Sarka");
         browser.findElement(By.id("registration-lastname")).sendKeys("Kozman");
         browser.findElement(By.id("recovery-email")).sendKeys("SarkaKozman");
         browser.findElement(By.id("registration-phone-wrapped")).sendKeys("725425750");
-        //scroll down??
         //click on reg button
-        browser.findElement(By.cssSelector(".reg-btn .btn-inset")).click();
-        //ověření, že vyskočí správná chybová hláška a registrace nebude dokončena
-        var actualNot = browser.findElement(By.cssSelector("#flashmessages")).getText();
-        Assertions.assertEquals("E-mail není zadán ve správném tvaru.", actualNot);
+        registrationFormPage.registrationButton();
+        //Check that a good error message is displayed and that the registration has not been completed successfully.
+        var wrongEmailNotification = registrationFormPage.getWrongEmailNotification();
+        Assertions.assertEquals("E-mail není zadán ve správném tvaru.", wrongEmailNotification);
 
     }
 
 
     @Test
-    void akceDneTest() {
-        Cart cartPage = new Cart(browser);
-        Product productPage = new Product(browser);
-        Home homePage = new Home(browser);
-        CategoryDetails categoryDetailsPage = new CategoryDetails(browser);
-        CrossCart crossCartPage = new CrossCart(browser);
-        ActionsOfDay actionsOfDayPage = new ActionsOfDay(browser);
-        ProductSelection productSelectionPage = new ProductSelection(browser);
+    void actionOfTheDayTest() {
 
-        //click on Akce dne
+        //click on action of the day
         homePage.actionOfTheDayButton();
-        //click on uplnenejvic
+        //click on section absolutely the most
         actionsOfDayPage.selectOfferOfTheDay(0);
-        //click on Lednice
-        categoryDetailsPage.selectAkceDneSubcategories(0);
+        //click on section fridges
+        categoryDetailsPage.selectActionOfTheDaySubcategories(0);
         //click on unique item
         productSelectionPage.selectItem(0);
-        //click on Koupit
+        //click on buy button
         productPage.addToCart();
         //go to cart
         crossCartPage.goToCart();
         //delete items
         cartPage.deleteCartItem(0);
-        //ověřit, že je košík prázdný
+        //check the cart is empty
         var noItemNotification = cartPage.getCartNotification();
         Assertions.assertEquals("Momentálně nemáte v košíku vloženo žádné zboží.", noItemNotification);
 
@@ -137,43 +141,38 @@ public class HomePageTest {
 
     @Test
     void searchFieldTest() {
-        Product productPage = new Product(browser);
-        ProductSelection productSelectionPage = new ProductSelection(browser);
-        Home homePage = new Home(browser);
-        Cart cartPage = new Cart(browser);
-        CrossCart crossCartPage = new CrossCart(browser);
-        CategoryDetails categoryDetailsPage = new CategoryDetails(browser);
 
         //click into search field
         homePage.searchField();
-        //click on Tipy na dárky
+        //click on tips for gifts
         homePage.searchFieldSpecialPhrase();
-        //click on Zážitky pro všechny
-        categoryDetailsPage.selectRozbalenoSubcategories(6);
-        //click on zobrazit více
+        //click on section experiences for everyone
+        categoryDetailsPage.selectUnpackedSubcategories(6);
+        //click on show more button
         productSelectionPage.showMorePopularItems();
         //click on 4. item
         productSelectionPage.selectPopularItem(3);
-        //click on celý popis
+        //click on whole product description
         productPage.showProductDescription();
-        //click on koupit
+        //click on buy button
         productPage.addToCart();
-        //click on zpět
+        //click on back button
         crossCartPage.goBack();
         //refresh the page
         browser.navigate().refresh();
-        //click on košík
+        //click on cart
         //homePage.goToCart();
 
-        //block od MALLu, nemůžu dokončit test a zkontrolovat další kroky
 
-        //přidat počet kusů
+        //blocked by MALL, i can´t continue and check other steps
+
+        //add more pieces
         //browser.findElements(By.cssSelector(".article-counter__btn--plus")).get(1).click();
-        //click on odstranit tuto zásilku
+        //click on delete this shipment
         //browser.findElement(By.cssSelector(".box-alert__body .delete-link .delete-text")).click();
-        //click on zpět v prohlížeči
+        //click on back button in browser
         //browser.navigate().back();
-        //ověřit, že v košíku není zboží, které bylo odstraněno
+        //check the cart is empty
         //var actualNot_NoItems = browser.findElement(By.cssSelector(".msg--indent-medium")).getText();
         //Assertions.assertEquals("Momentálně nemáte v košíku vloženo žádné zboží.", actualNot_NoItems);
 
@@ -181,69 +180,63 @@ public class HomePageTest {
 
     @Test
     void clickBackTest() {
-        Home homePage = new Home(browser);
-        //click on Akce dne
+
+        //click on action of the day
         homePage.actionOfTheDayButton();
-        //click on zpět v prohlížeči
+        //click on back button in browser
         browser.navigate().back();
-        //ověřit, že jsem o krok zpět na úvodní stránce
+        //check main page
         Assertions.assertEquals("MALL.CZ – bílé zboží, elektronika, PC, outdoor, hobby, hračky, kosmetika, chovatelské potřeby", browser.getTitle());
     }
 
     @Test
     void headerMenuTest() {
-        Home homePage = new Home(browser);
-        //click on Ceny dopravy
+
+        //click on section transport price
         homePage.headerMenuSections(0);
-        //click on Vše o nákupu
+        //click on section everything about buying
         homePage.headerMenuSections(1);
-        //click on Pro firmy
+        //click on section for companies
         homePage.headerMenuSections(2);
-        //click on Výdejní místa
+        //click on section dispensing points
         homePage.headerMenuSections(3);
         //click on back
         browser.navigate().back();
-        //click on Kontakt
+        //click on section contact
         homePage.headerMenuSections(4);
         //click on back
         browser.navigate().back();
-        //click on Kategorie od A do Z
+        //click on categories from A to Z
         homePage.headerMenuSections(5);
         //click on main logo
         browser.navigate().to("https://www.mall.cz/");
 
-        //ověřit, že jsem na hlavní stránce mall
+        //check main page
         Assertions.assertEquals("MALL.CZ – bílé zboží, elektronika, PC, outdoor, hobby, hračky, kosmetika, chovatelské potřeby", browser.getTitle());
 
     }
 
     @Test
     void boatTest() {
-        Product productPage = new Product(browser);
-        Home homePage = new Home(browser);
-        ProductSelection productSelectionPage = new ProductSelection(browser);
-        Cart cartPage = new Cart(browser);
-        CategoryDetails categoryDetailsPage = new CategoryDetails(browser);
-        CrossCart crossCartPage = new CrossCart(browser);
 
-        //click on Sport a outdoor
+        //click on section sports and outdoor
         homePage.openItemsOfCategory(8);
-        // Click on Sporty
+        // Click on section sports
         categoryDetailsPage.selectCategory(0);
-        // Click on Rybářské potřeby
+        // Click on fishing equipment
         categoryDetailsPage.selectSubcategory(40);
-        // Click on Rybářské lodě
+        // Click on section fishing boats
         categoryDetailsPage.selectSubcategory(5);
-        // Click on Rybářské čluny
+        // Click on section fishing boats
         categoryDetailsPage.selectSubcategory(4);
-        // Click on 1. Nejprodávanější
+        // Click on 1. item from section bestsellers
         productSelectionPage.selectPopularItem(0);
 
         var expectedName = productPage.getProductName();
 
-        // Click on Koupit
+        // Click on buy button
         productPage.addToCart();
-        // Click on Přejít do košíku
+        // Click on go to cart
         crossCartPage.goToCart();
 
         var actualName = cartPage.getProductName(0);
@@ -255,7 +248,6 @@ public class HomePageTest {
 
     @Test
     void cartOperations() {
-        Cart cartPage = new Cart(browser);
 
         cartPage.open();
         cartPage.goBack();

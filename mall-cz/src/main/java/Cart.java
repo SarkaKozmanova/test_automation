@@ -23,7 +23,6 @@ public class Cart {
 
     void deleteCartItem(int index) {
         browser.findElements(By.cssSelector(".cart-overview-item-row__delete .cart__remove-icon")).get(index).click();
-
     }
 
     String getCartNotification() {
