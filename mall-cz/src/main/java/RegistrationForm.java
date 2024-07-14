@@ -19,21 +19,19 @@ public class RegistrationForm {
         return browser.findElement(By.cssSelector("#flashmessages")).getText();
     }
 
-
-    /*
     void insertFirstName(String name){
-        Objects.requireNonNull(name);
-
-        var firstNameField = elementFinder.findElement(By.id("registration-firstname")).sendKeys(name);
+        browser.findElement(By.id("registration-firstname")).sendKeys(name);
     }
 
-
-        void insertName(String name) {
-        Objects.requireNonNull(name);
-
-        var nameInputBox = elementFinder.findByCssSelector("#name");
-        nameInputBox.sendKeys(name);
+    void insertLastName(String name){
+        browser.findElement(By.id("registration-lastname")).sendKeys(name);
     }
-     */
 
+    void insertEmail(String email){
+        browser.findElement(By.id("recovery-email")).sendKeys(email);
+    }
+
+    void insertMobileNumber(String mobile){
+        browser.findElement(By.id("registration-phone-wrapped")).sendKeys(mobile);
+    }
 }

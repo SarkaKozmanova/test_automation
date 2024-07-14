@@ -33,5 +33,11 @@ public class Cart {
         return browser.findElements(By.cssSelector(".cart-layout__group .cart-overview-item-title a")).get(index).getText();
     }
 
+    String getPrice(int index) {
+        return browser.findElements(By.cssSelector(".cart-overview-item-price .bold")).get(index).getText();
+    }
 
+    void addPiece() {
+        browser.findElement(By.cssSelector(".box-alert__body .article-counter__btn--plus span")).click();
+    }
 }

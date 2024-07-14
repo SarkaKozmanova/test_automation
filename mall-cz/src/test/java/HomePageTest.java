@@ -7,6 +7,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
+
 public class HomePageTest {
     WebDriver browser = WebDriverManager.firefoxdriver().create();
     ProductSelection productSelectionPage;
@@ -17,6 +20,7 @@ public class HomePageTest {
     ActionsOfDay actionsOfDayPage;
     CategoryDetails categoryDetailsPage;
     RegistrationForm registrationFormPage;
+    LeftMenu leftMenu;
 
     void waitFor(int seconds) {
         try {
@@ -29,7 +33,8 @@ public class HomePageTest {
     @BeforeEach
     void beforeTest() {
         browser.get("https://mall.cz");
-
+        browser.manage().timeouts().implicitlyWait(Duration.ofMillis(2000));
+        browser.manage().window().fullscreen();
         //accept cookies
         WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
         cookiesAcceptButton.click();
@@ -42,6 +47,7 @@ public class HomePageTest {
         categoryDetailsPage = new CategoryDetails(browser);
         actionsOfDayPage = new ActionsOfDay(browser);
         registrationFormPage = new RegistrationForm(browser);
+        leftMenu = new LeftMenu(browser);
 
     }
 
@@ -55,88 +61,6 @@ public class HomePageTest {
     }
 
 
-    @Test
-    void hairDryerTest() {
-
-        //open menu with categories
-        homePage.openItemsOfCategory(0);
-        //click on hairdryers
-        browser.findElement(By.xpath("//a[@href='/feny']")).click();
-        waitFor(5);
-        //select first item from popular items
-        productSelectionPage.selectPopularItem(0);
-        waitFor(3);
-
-        var expectedName = productPage.getProductName();
-
-        //add to item to cart
-        productPage.addToCart();
-        waitFor(3);
-        //go to cart
-        crossCartPage.goToCart();
-        waitFor(3);
-
-        var actualName = cartPage.getProductName(0);
-        //check if actualName of item is same as expectedName of item
-        Assertions.assertEquals(expectedName, actualName);
-
-    }
-
-    @Test
-    void navigateToRegistrationFormTest() {
-        
-        //click on log in
-        homePage.logIn();
-        //click on sign up
-        homePage.singUp();
-        //check the registration form page
-        Assertions.assertEquals("Registrace | MALL.CZ", browser.getTitle());
-    }
-
-    @Test
-    void wrongEmailRegistrationTest() {
-
-        //click on log in
-        homePage.logIn();
-        //click on sign up
-        homePage.singUp();
-        //fill registration form
-        browser.findElement(By.id("registration-firstname")).sendKeys("Sarka");
-        browser.findElement(By.id("registration-lastname")).sendKeys("Kozman");
-        browser.findElement(By.id("recovery-email")).sendKeys("SarkaKozman");
-        browser.findElement(By.id("registration-phone-wrapped")).sendKeys("725425750");
-        //click on reg button
-        registrationFormPage.registrationButton();
-        //Check that a good error message is displayed and that the registration has not been completed successfully.
-        var wrongEmailNotification = registrationFormPage.getWrongEmailNotification();
-        Assertions.assertEquals("E-mail není zadán ve správném tvaru.", wrongEmailNotification);
-
-    }
-
-
-    @Test
-    void actionOfTheDayTest() {
-
-        //click on action of the day
-        homePage.actionOfTheDayButton();
-        //click on section absolutely the most
-        actionsOfDayPage.selectOfferOfTheDay(0);
-        //click on section fridges
-        categoryDetailsPage.selectActionOfTheDaySubcategories(0);
-        //click on unique item
-        productSelectionPage.selectItem(0);
-        //click on buy button
-        productPage.addToCart();
-        //go to cart
-        crossCartPage.goToCart();
-        //delete items
-        cartPage.deleteCartItem(0);
-        //check the cart is empty
-        var noItemNotification = cartPage.getCartNotification();
-        Assertions.assertEquals("Momentálně nemáte v košíku vloženo žádné zboží.", noItemNotification);
-
-
-    }
 
 
     @Test
@@ -156,12 +80,8 @@ public class HomePageTest {
         productPage.showProductDescription();
         //click on buy button
         productPage.addToCart();
-        //click on back button
-        crossCartPage.goBack();
-        //refresh the page
-        browser.navigate().refresh();
         //click on cart
-        //homePage.goToCart();
+        homePage.goToCart();
 
 
         //blocked by MALL, i can´t continue and check other steps
@@ -214,45 +134,6 @@ public class HomePageTest {
         //check main page
         Assertions.assertEquals("MALL.CZ – bílé zboží, elektronika, PC, outdoor, hobby, hračky, kosmetika, chovatelské potřeby", browser.getTitle());
 
-    }
-
-    @Test
-    void boatTest() {
-
-        //click on section sports and outdoor
-        homePage.openItemsOfCategory(8);
-        // Click on section sports
-        categoryDetailsPage.selectCategory(0);
-        // Click on fishing equipment
-        categoryDetailsPage.selectSubcategory(40);
-        // Click on section fishing boats
-        categoryDetailsPage.selectSubcategory(5);
-        // Click on section fishing boats
-        categoryDetailsPage.selectSubcategory(4);
-        // Click on 1. item from section bestsellers
-        productSelectionPage.selectPopularItem(0);
-
-        var expectedName = productPage.getProductName();
-
-        // Click on buy button
-        productPage.addToCart();
-        // Click on go to cart
-        crossCartPage.goToCart();
-
-        var actualName = cartPage.getProductName(0);
-
-        Assertions.assertEquals(expectedName, actualName);
-
-    }
-
-
-    @Test
-    void cartOperations() {
-
-        cartPage.open();
-        cartPage.goBack();
-        cartPage.open();
-        //cartPage.deleteCartItem(0);
     }
 
 

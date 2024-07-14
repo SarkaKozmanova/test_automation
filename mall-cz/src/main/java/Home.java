@@ -35,18 +35,18 @@ public class Home {
     }
 
     void goToCart() {
-        browser.findElement(By.cssSelector(".cart__link")).click();
+        browser.findElement(By.cssSelector(".cart__link > div:nth-child(1)")).click();
     }
 
-    void searchFieldSpecialPhrase(){
+    void searchFieldSpecialPhrase() {
         browser.findElement(By.cssSelector(".site-search-special-phrase")).click();
     }
 
-    void logIn(){
+    void logIn() {
         browser.findElement(By.cssSelector(".desktop-icons__item--user")).click();
     }
 
-    void singUp(){
+    void singUp() {
         browser.findElement(By.cssSelector(".user-unsigned__registration")).click();
     }
 
