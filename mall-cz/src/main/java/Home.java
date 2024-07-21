@@ -1,53 +1,19 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class Home {
+public class Home extends MallPage{
 
-    WebDriver browser;
 
-    public Home(WebDriver browser) {
-        this.browser = browser;
+    Home(WebDriver browser) {
+        super(browser);
     }
 
     void openSubcategories(int index) {
         browser.findElements(By.cssSelector(".desktop-menu__item-title")).get(index).click();
     }
 
-    //use for categories appliances/mobiles/TV
-    void openItemsOfCategory(int index) {
-        browser.findElements(By.cssSelector(".desktop-menu__item-title")).get(index).click();
-    }
-
-    void searchField() {
-        browser.findElement(By.cssSelector("#site-search")).click();
-    }
-
-    void headerMenuSections(int index) {
-        browser.findElements(By.cssSelector(".list-item__link__text")).get(index).click();
-    }
-
-    void mainLogo() {
-        browser.findElement(By.cssSelector(".header__big-logo")).click();
-    }
-
     void actionOfTheDayButton() {
         browser.findElement(By.cssSelector(".corner-wrapper__img")).click();
-    }
-
-    void goToCart() {
-        browser.findElement(By.cssSelector(".cart__link > div:nth-child(1)")).click();
-    }
-
-    void searchFieldSpecialPhrase() {
-        browser.findElement(By.cssSelector(".site-search-special-phrase")).click();
-    }
-
-    void logIn() {
-        browser.findElement(By.cssSelector(".desktop-icons__item--user")).click();
-    }
-
-    void singUp() {
-        browser.findElement(By.cssSelector(".user-unsigned__registration")).click();
     }
 
 

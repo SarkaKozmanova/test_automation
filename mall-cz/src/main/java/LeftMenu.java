@@ -1,16 +1,12 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-import java.util.HashMap;
+public class LeftMenu extends MallPage{
 
-public class LeftMenu {
-    WebDriver browser;
 
     LeftMenu(WebDriver browser) {
-        this.browser = browser;
-
+        super(browser);
     }
-
 
     void clickMenuItem(String mainMenu, String secondaryMenu) {
         browser.findElement(By.xpath("//ul[@class='desktop-menu__list']//span[contains(text(), '" + mainMenu + "')]")).click();
@@ -19,7 +15,7 @@ public class LeftMenu {
 
     void clickCategories(String mainMenu, String secondaryMenu) {
         browser.findElement(By.xpath("//ul[@class='desktop-menu__list']//span[contains(text(), '" + mainMenu + "')]")).click();
-        browser.findElement(By.xpath("//div[@class='category-tile-item__full-width__box']//span[contains(text(), '" + secondaryMenu + "')]")).click();
+        browser.findElement(By.xpath("//a[@class='category-tile-item__full-width']//span[contains(text(), '" + secondaryMenu + "')]")).click();
     }
 
     void clickSubcategories(String mainMenu, String secondaryMenu, String tertiaryMenu) {

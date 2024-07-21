@@ -1,12 +1,11 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class ProductSelection {
+public class ProductSelection extends MallPage {
 
-    WebDriver browser;
 
-    public ProductSelection(WebDriver browser) {
-        this.browser = browser;
+    ProductSelection(WebDriver browser) {
+        super(browser);
     }
 
     void showMore() {
@@ -18,15 +17,18 @@ public class ProductSelection {
     }
 
     void selectPopularItem(int index) {
+        wait.until(s -> browser.findElement(By.cssSelector(".bs__name")).isDisplayed());
         browser.findElements(By.cssSelector(".bs__name")).get(index).click();
     }
 
     void showMorePopularItems() {
+        wait.until(s -> browser.findElement(By.cssSelector(".bs__show-more-link")).isDisplayed());
         browser.findElement(By.cssSelector(".bs__show-more-link")).click();
     }
 
     void selectItem(int index) {
-        browser.findElements(By.cssSelector(".gallery-list")).get(index).click();
+        wait.until(s -> browser.findElement(By.cssSelector(".hooper-list")).isDisplayed());
+        browser.findElements(By.cssSelector(".hooper-list")).get(index).click();
     }
 
 }

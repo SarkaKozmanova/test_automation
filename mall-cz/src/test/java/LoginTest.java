@@ -1,37 +1,17 @@
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-
 import java.time.Duration;
 
-public class LoginTest {
+public class LoginTest extends BaseTest {
 
-    WebDriver browser = WebDriverManager.firefoxdriver().create();
     Home homePage;
     RegistrationForm registrationFormPage;
 
 
-    void waitFor(int seconds) {
-        try {
-            Thread.sleep(seconds * 1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @BeforeEach
     void beforeTest() {
-        browser.get("https://mall.cz");
-        browser.manage().timeouts().implicitlyWait(Duration.ofMillis(2000));
-        browser.manage().window().fullscreen();
-        //accept cookies
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
-
+        //browser.manage().timeouts().implicitlyWait(Duration.ofMillis(2000));
         homePage = new Home(browser);
         registrationFormPage = new RegistrationForm(browser);
 
@@ -44,7 +24,7 @@ public class LoginTest {
         //click on log in
         homePage.logIn();
         //click on sign up
-        homePage.singUp();
+        homePage.signUp();
         //check the registration form page
         Assertions.assertEquals("Registrace | MALL.CZ", browser.getTitle());
     }
@@ -55,7 +35,7 @@ public class LoginTest {
         //click on log in
         homePage.logIn();
         //click on sign up
-        homePage.singUp();
+        homePage.signUp();
         //fill registration form
         registrationFormPage.insertFirstName("Sarka");
         registrationFormPage.insertLastName("Kozmanova");

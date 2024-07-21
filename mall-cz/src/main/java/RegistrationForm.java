@@ -1,22 +1,16 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-import java.util.Objects;
-
-public class RegistrationForm {
-    WebDriver browser;
-
-    public RegistrationForm(WebDriver browser) {
-        this.browser = browser;
-    }
+public class RegistrationForm extends MallPage{
 
 
-    void registrationButton(){
-        browser.findElement(By.cssSelector(".reg-btn .btn-inset")).click();
+    RegistrationForm(WebDriver browser) {
+        super(browser);
     }
 
     String getWrongEmailNotification() {
-        return browser.findElement(By.cssSelector("#flashmessages")).getText();
+        wait.until(s -> browser.findElement(By.id("flashmessages")).isDisplayed());
+        return browser.findElement(By.id("flashmessages")).getText();
     }
 
     void insertFirstName(String name){

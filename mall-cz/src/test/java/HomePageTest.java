@@ -1,17 +1,11 @@
-import io.github.bonigarcia.wdm.WebDriverManager;
-import io.github.bonigarcia.wdm.webdriver.WebDriverBrowser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
-import java.time.temporal.TemporalUnit;
 
-public class HomePageTest {
-    WebDriver browser = WebDriverManager.firefoxdriver().create();
+
+public class HomePageTest extends BaseTest{
     ProductSelection productSelectionPage;
     Product productPage;
     Cart cartPage;
@@ -22,22 +16,10 @@ public class HomePageTest {
     RegistrationForm registrationFormPage;
     LeftMenu leftMenu;
 
-    void waitFor(int seconds) {
-        try {
-            Thread.sleep(seconds * 1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @BeforeEach
     void beforeTest() {
-        browser.get("https://mall.cz");
-        browser.manage().timeouts().implicitlyWait(Duration.ofMillis(2000));
-        browser.manage().window().fullscreen();
-        //accept cookies
-        WebElement cookiesAcceptButton = browser.findElement(By.cssSelector(".legal-consent__button--gray"));
-        cookiesAcceptButton.click();
+        //browser.manage().timeouts().implicitlyWait(Duration.ofMillis(2000));
 
         productSelectionPage = new ProductSelection(browser);
         productPage = new Product(browser);
@@ -77,24 +59,23 @@ public class HomePageTest {
         //click on 4. item
         productSelectionPage.selectPopularItem(3);
         //click on whole product description
-        productPage.showProductDescription();
+        productPage.showProductDescription(); //advert error
         //click on buy button
         productPage.addToCart();
         //click on cart
-        homePage.goToCart();
+        crossCartPage.goToCart(); //advert error
+        //set var for actual price - 1 piece
+        var price = cartPage.getPrice(0);
+        int priceNum = Integer.parseInt(price.replaceAll("[^\\d.]", ""));
+        //add 1 piece
+        cartPage.addPiece();
+        waitFor(3);
+        //set var for actual price - 2 pieces
+        var cartPrice = cartPage.getPrice(0);
+        int cartPriceNum = Integer.parseInt(cartPrice.replaceAll("[^\\d.]", ""));
+        //check if actualPriceTwoPieces is the same as expectedPriceTwoPieces
+        Assertions.assertEquals(priceNum * 2, cartPriceNum);
 
-
-        //blocked by MALL, i can´t continue and check other steps
-
-        //add more pieces
-        //browser.findElements(By.cssSelector(".article-counter__btn--plus")).get(1).click();
-        //click on delete this shipment
-        //browser.findElement(By.cssSelector(".box-alert__body .delete-link .delete-text")).click();
-        //click on back button in browser
-        //browser.navigate().back();
-        //check the cart is empty
-        //var actualNot_NoItems = browser.findElement(By.cssSelector(".msg--indent-medium")).getText();
-        //Assertions.assertEquals("Momentálně nemáte v košíku vloženo žádné zboží.", actualNot_NoItems);
 
     }
 

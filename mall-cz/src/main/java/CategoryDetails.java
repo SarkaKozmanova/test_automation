@@ -1,17 +1,17 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class CategoryDetails {
-    WebDriver browser;
+public class CategoryDetails extends MallPage{
 
-    public CategoryDetails(WebDriver browser) {
-        this.browser = browser;
+    CategoryDetails(WebDriver browser) {
+        super(browser);
     }
 
 
     //use for catogories sport/household/fashion
 
     void selectCategory(int index) {
+        wait.until(s -> browser.findElement(By.cssSelector(".category-tile-item__wrapper")).isDisplayed());
         browser.findElements(By.cssSelector(".category-tile-item__wrapper")).get(index).click();
     }
 

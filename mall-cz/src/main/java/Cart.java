@@ -1,12 +1,11 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class Cart {
+public class Cart extends MallPage{
 
-    WebDriver browser;
 
-    public Cart(WebDriver browser) {
-        this.browser = browser;
+    Cart(WebDriver browser) {
+        super(browser);
     }
 
     void open() {
@@ -26,14 +25,17 @@ public class Cart {
     }
 
     String getCartNotification() {
+        wait.until(s -> browser.findElement(By.cssSelector(".msg--indent-medium")).isDisplayed());
         return browser.findElement(By.cssSelector(".msg--indent-medium")).getText();
     }
 
     String getProductName(int index) {
+        wait.until(s -> browser.findElement(By.cssSelector(".cart-layout__group .cart-overview-item-title a")).isDisplayed());
         return browser.findElements(By.cssSelector(".cart-layout__group .cart-overview-item-title a")).get(index).getText();
     }
 
     String getPrice(int index) {
+        wait.until(s -> browser.findElement(By.cssSelector(".cart-overview-item-price .bold")).isDisplayed());
         return browser.findElements(By.cssSelector(".cart-overview-item-price .bold")).get(index).getText();
     }
 
